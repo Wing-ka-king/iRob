@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>ras_lab1_controllers</name>
+  <version>0.0.0</version>
+  <description>The Matapackage ras_lab1_controllers</description>
+
+  
+  <maintainer email="akashsin@kth.se">akash</maintainer>
+
+
+  <license>BSD</license>
+
+
+  <author email="akashsin@kth.se">Akash Singh</author> -->
+
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+
+  <export>
+    <metapackage />
+  </export>
+</package>
