@@ -100,7 +100,7 @@ class Mapping:
                 return True
         return False
 
-    def update_map(self, grid_map, pose, scan):
+    def update_map(self, grid_map, pose, scan): # laser scan
 
         # Current yaw of the robot
         robot_yaw = self.get_yaw(pose.pose.orientation)
