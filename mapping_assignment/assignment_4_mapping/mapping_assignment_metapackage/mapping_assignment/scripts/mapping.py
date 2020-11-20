@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 
 """
-    # {student full name}
+    # Akash Singh
     # {student id}
-    # {student email}
+    # akashsin@kth.se
 """
 
 # Python standard library
@@ -101,49 +101,6 @@ class Mapping:
         return False
 
     def update_map(self, grid_map, pose, scan):
-        """Updates the grid_map with the data from the laser scan and the pose.
-        
-        For E: 
-            Update the grid_map with self.occupied_space.
-
-            Return the updated grid_map.
-
-            You should use:
-                self.occupied_space  # For occupied space
-
-                You can use the function add_to_map to be sure that you add
-                values correctly to the map.
-
-                You can use the function is_in_bounds to check if a coordinate
-                is inside the map.
-
-        For C:
-            Update the grid_map with self.occupied_space and self.free_space. Use
-            the raytracing function found in this file to calculate free space.
-
-            You should also fill in the update (OccupancyGridUpdate()) found at
-            the bottom of this function. It should contain only the rectangle area
-            of the grid_map which has been updated.
-
-            Return both the updated grid_map and the update.
-
-            You should use:
-                self.occupied_space  # For occupied space
-                self.free_space      # For free space
-
-                To calculate the free space you should use the raytracing function
-                found in this file.
-
-                You can use the function add_to_map to be sure that you add
-                values correctly to the map.
-
-                You can use the function is_in_bounds to check if a coordinate
-                is inside the map.
-
-        :type grid_map: GridMap
-        :type pose: PoseStamped
-        :type scan: LaserScan
-        """
 
         # Current yaw of the robot
         robot_yaw = self.get_yaw(pose.pose.orientation)
@@ -154,15 +111,38 @@ class Mapping:
         resolution = grid_map.get_resolution()
 
 
-        """
-        Fill in your solution here
-        """
+        obstacle_list = []
+        for i in range(0,len(scan.ranges)):
+            if (scan.range_min < scan.ranges[i] < scan.range_max):
+                bearing = scan.angle_min + scan.angle_increment*i
+                x_map = scan.ranges[i]*cos(bearing + robot_yaw) + pose.pose.position.x - origin.position.x
+                y_map = scan.ranges[i]*sin(bearing + robot_yaw) + pose.pose.position.y - origin.position.y
+                
+                bot_pos_x = pose.pose.position.x - origin.position.x
+                bot_pos_y = pose.pose.position.y - origin.position.y
+
+                x_start = int(bot_pos_x/resolution)
+                y_start = int(bot_pos_y/resolution)
+                                
+                x = int(x_map/resolution)
+                y = int(y_map/resolution)
+
+                start = [x_start,y_start]
+                end = [x, y]
+
+                free_cells = self.raytrace(start, end)
+                length_1 = len(free_cells)
+                for i in range(0,length_1):
+                    #if grid_map[free_cells[i][0], free_cells[i][1]] != self.occupied_space:
+                    self.add_to_map(grid_map, free_cells[i][0], free_cells[i][1], self.free_space)
+                        
+                obstacle_list.append((int(x),int(y)))
 
 
-        """
-        For C only!
-        Fill in the update correctly below.
-        """ 
+        length = len(obstacle_list)
+        for i in range(0,length):       
+            self.add_to_map(grid_map, obstacle_list[i][0], obstacle_list[i][1], self.occupied_space)
+
         # Only get the part that has been updated
         update = OccupancyGridUpdate()
         # The minimum x index in 'grid_map' that has been updated
@@ -173,43 +153,46 @@ class Mapping:
         update.width = 0
         # Maximum y index - minimum y index + 1
         update.height = 0
-        # The map data inside the rectangle, in row-major order.
-        update.data = []
 
-        # Return the updated map together with only the
-        # part of the map that has been updated
+        max_x = 0
+        max_y = 0
+        x_obs_list = []
+        y_obs_list = []
+
+        for i in obstacle_list:
+            x_obs_list.append(i[0])
+            y_obs_list.append(i[1])
+
+        update.x = min(x_obs_list)
+        update.y = min(y_obs_list)
+        max_x = max(x_obs_list)
+        max_y = max(y_obs_list)
+
+        update.width = max_x - update.x + 1
+        update.height = max_y - update.y + 1
+        #update.data = [self.unknown_space for _ in range(update.width*update.height)]
+        update.data = []
+       
+        for m in range(0, update.height):
+            for n in range(0, update.width):            
+                update.data.append(grid_map[n + update.x, m + update.y])
+
         return grid_map, update
 
     def inflate_map(self, grid_map):
-        """For C only!
-        Inflate the map with self.c_space assuming the robot
-        has a radius of self.radius.
-        
-        Returns the inflated grid_map.
 
-        Inflating the grid_map means that for each self.occupied_space
-        you calculate and fill in self.c_space. Make sure to not overwrite
-        something that you do not want to.
+        radius = self.radius
 
+        for m in range(0, grid_map.get_width()):
+            for n in range(0, grid_map.get_width()):            
+                if grid_map[m,n] == self.occupied_space:
+                    for i in range(-radius, +radius):
+                        for j in range(-radius, +radius):
+                           x = m+i
+                           y = n+j
+                           if grid_map[x,y] != self.occupied_space:
+                               if (np.sqrt((x-m)**2 + (y-n)**2) <= radius):
+                                   self.add_to_map(grid_map, x ,y, self.c_space)
+            
 
-        You should use:
-            self.c_space  # For C space (inflated space).
-            self.radius   # To know how much to inflate.
-
-            You can use the function add_to_map to be sure that you add
-            values correctly to the map.
-
-            You can use the function is_in_bounds to check if a coordinate
-            is inside the map.
-
-        :type grid_map: GridMap
-        """
-
-
-        """
-        Fill in your solution here
-        """
-
-        
-        # Return the inflated map
         return grid_map
