@@ -67,7 +67,7 @@ class EngineROS:
 
         self.__map, update = self.__mapping.update_map(self.__map, pose, scan)
 
-        if isinstance(update, OccupancyGridUpdate):
+        if isinstance(update, OccupancyGridUpdate) and len(update.data) != 0:
             self.publish_map_update(update)
             map = copy.deepcopy(self.__map)
             self.__inflated_map = self.__mapping.inflate_map(map)

@@ -1,0 +1,13 @@
+<launch>
+
+  <!-- mapping assignment play.launch -->
+  <include file="$(find mapping_assignment)/launch/play.launch" />
+
+  <!-- play rosbag -->
+  <node pkg="rosbag" type="play" name="player" output="screen" args="-r -l 1 --clock $(find mapping_assignment)/bags/stage_1.bag" launch-prefix="xterm -e" /> 
+  
+  <!-- rosrun mapping_assignment main.py -->
+  <node pkg="mapping_assignment" type="main.py" name="mapping_main" clear_params="true" />
+</launch>
+
+
