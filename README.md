@@ -1,7 +1,7 @@
 # Introduction-to-Robotics-DD2410-
 Assignment work in KTH course- Introduction to Robotics.
 
-## Assignment 1: ROS Taster
+## Assignment 1: ROS Basics
 This assignment allowed students to get familiarized with ros environment. The objective was to make a wall follower using Kobuki robot simulation. This was divided into three tasks:
 
 - To make an open loop controller. 
