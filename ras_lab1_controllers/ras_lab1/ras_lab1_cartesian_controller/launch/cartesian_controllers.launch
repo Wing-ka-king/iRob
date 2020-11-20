@@ -1,0 +1,9 @@
+<launch>
+
+  <!-- run ras_lab1_cartesian_controller -->
+  <node pkg="rostopic" type="rostopic" name="arbitrary_name" args="pub -r 10 /motor_controller/twist geometry_msgs/Twist  '{linear:  {x: 0.6, y: 0.0, z: 0.0}, angular: {x: 0.0,y: 0.0,z: 0.0}}'" output="screen"/>
+
+  <node pkg="ras_lab1_cartesian_controller" type="cartesian_controller.py" name="cartesian_controller" clear_params="true"  />
+
+  
+</launch>

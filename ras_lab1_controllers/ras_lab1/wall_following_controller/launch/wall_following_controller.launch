@@ -1,0 +1,7 @@
+<launch>
+
+  <node pkg="wall_following_controller" type="wall_following_controller.py" name="wall_following_controller" clear_params="true"  />
+
+  <node pkg="ras_lab1_cartesian_controller" type="cartesian_controller.py" name="cartesian_controller" clear_params="true"  />
+  
+</launch>
